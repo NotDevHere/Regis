@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NotDevPay - Registrasi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(120deg, blue, red);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .register-container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 400px;
+      backdrop-filter: blur(10px);
+    }
+
+    .register-container h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: white;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: white;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background-color: black;
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .submit-btn:hover {
+      background-color: #222;
+    }
+
+    .error {
+      color: yellow;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="register-container">
+    <h2>Registrasi Akun</h2>
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="emailConfirm">Verifikasi Email:</label>
+        <input type="email" id="emailConfirm" required>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Nomor Telepon:</label>
+        <input type="tel" id="phone" required pattern="[0-9]{10,15}">
+      </div>
+
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" required minlength="3">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" required minlength="6">
+      </div>
+
+      <button type="submit" class="submit-btn">Daftar</button>
+      <p id="errorMsg" class="error"></p>
+    </form>
+  </div>
+
+  <!-- Firebase JS SDK (modular, ES6 style) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    // Konfigurasi Firebase kamu
+    const firebaseConfig = {
+      apiKey: "AIzaSyCucGYmu6PqzCAPSyTf-PYyfUGJF_lhrc8",
+      authDomain: "notdev-3a881.firebaseapp.com",
+      projectId: "notdev-3a881",
+      storageBucket: "notdev-3a881.appspot.com",
+      messagingSenderId: "1062855588809",
+      appId: "1:1062855588809:web:0e69ccccfb1554c560c618",
+      measurementId: "G-XXGS0T9E5E"
+    };
+
+    // Inisialisasi Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const form = document.getElementById("registerForm");
+    const errorMsg = document.getElementById("errorMsg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const emailConfirm = document.getElementById("emailConfirm").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (email !== emailConfirm) {
+        errorMsg.textContent = "Email dan verifikasi email tidak cocok.";
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await set(ref(db, 'users/' + user.uid), {
+          email: email,
+          phone: phone,
+          username: username
+        });
+
+        alert("Registrasi berhasil!");
+        window.location.href = "login.html"; // ganti jika kamu punya halaman login
+      } catch (error) {
+        errorMsg.textContent = error.message;
+      }
+    });
+  </script>
+</body>
+</html>
