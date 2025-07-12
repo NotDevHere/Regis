@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registrasi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Roboto Mono', monospace;
+    }
+
+    body {
+      background-color: #000;
+      color: #0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .register-box {
+      width: 100%;
+      max-width: 350px;
+      background-color: #000;
+      padding: 30px;
+      border-radius: 10px;
+      border: 1px solid #0f0;
+    }
+
+    .register-box h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #0f0;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #0f0;
+      border-radius: 5px;
+      background-color: #111;
+      color: #0f0;
+    }
+
+    input::placeholder {
+      color: #1aff1a;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #0f0;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #1aff1a;
+    }
+
+    .login-link {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+      color: #1aff1a;
+    }
+
+    .login-link a {
+      color: #00ffcc;
+      text-decoration: none;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="register-box">
+    <h2>REGISTRASI</h2>
+    <form onsubmit="handleRegister(event)">
+      <input type="text" id="name" placeholder="Nama lengkap" required>
+      <input type="text" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">DAFTAR</button>
+    </form>
+    <div class="login-link">
+      Punya akun? <a href="login.html">Login</a>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD2ADijzGyjvNLUahH4M5_dChev1iMgjWw",
+      authDomain: "proplayer-d1e07.firebaseapp.com",
+      databaseURL: "https://proplayer-d1e07-default-rtdb.firebaseio.com",
+      projectId: "proplayer-d1e07",
+      storageBucket: "proplayer-d1e07.appspot.com",
+      messagingSenderId: "699630005844",
+      appId: "1:699630005844:web:715ace8c82777054e487c1",
+      measurementId: "G-3B0JSRY7Z2"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    function handleRegister(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          const uid = userCredential.user.uid;
+
+          // Simpan ke Realtime Database
+          db.ref("users/" + uid).set({
+            name: name,
+            email: email
+          });
+
+          // Simpan ke localStorage
+          localStorage.setItem("uid", uid);
+          localStorage.setItem("username", name);
+          localStorage.setItem("email", email);
+
+          alert("Registrasi berhasil!");
+          window.location.href = "dashboard.html";
+        })
+        .catch(error => {
+          alert("Gagal daftar: " + error.message);
+        });
+    }
+  </script>
+
+</body>
+</html>
